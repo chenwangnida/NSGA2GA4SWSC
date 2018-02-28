@@ -8,11 +8,12 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 
+import wsc.ecj.nsga2.SequenceVectorIndividual;
 import wsc.graph.ServiceEdge;
 
 public class WSCEvaluation {
 
-	public void aggregationAttribute(WSCIndividual individual, DirectedGraph<String, ServiceEdge> directedGraph) {
+	public void aggregationAttribute(SequenceVectorIndividual individual, DirectedGraph<String, ServiceEdge> directedGraph) {
 
 		double a = 1.0;
 		double r = 1.0;
@@ -52,10 +53,9 @@ public class WSCEvaluation {
 		individual.setReliability(r);
 		individual.setTime(t);
 		individual.setCost(c);
-		individual.setStrRepresentation(directedGraph.toString());
 	}
 
-	public double calculateFitness(WSCIndividual individual) {
+	public double calculateFitness(SequenceVectorIndividual individual) {
 
 		double mt = individual.getMatchingType();
 		double dst = individual.getSemanticDistance();

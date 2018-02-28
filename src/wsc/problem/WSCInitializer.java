@@ -30,6 +30,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Table;
 
 import ec.EvolutionState;
+import ec.Population;
+import ec.Subpopulation;
 import ec.simple.SimpleInitializer;
 import ec.util.Parameter;
 import wsc.InitialWSCPool;
@@ -90,6 +92,8 @@ public class WSCInitializer extends SimpleInitializer {
 	public static Map<Integer, Service> Index2ServiceMap = new HashMap<Integer, Service>();
 	public static BiMap<Integer, String> serviceIndexBiMap = HashBiMap.create();
 	public static Table<String, String, Double> semanticMatrix;
+	public WSCEvaluation eval;
+	public WSCGraph graGenerator;
 
 	// logs settings
 	public static String logName;
@@ -103,9 +107,8 @@ public class WSCInitializer extends SimpleInitializer {
 		random = new WSCRandom(state.random[0]);
 		super.setup(state, base);
 
-		// does it required to new this ?????
-		// state.population = new Population();
-		// state.population.subpops = new Subpopulation[0];
+		state.population = new Population();
+		state.population.subpops = new Subpopulation[0];
 
 		Parameter servicesParam = new Parameter("composition-services");
 		Parameter taskParam = new Parameter("composition-task");
@@ -166,6 +169,11 @@ public class WSCInitializer extends SimpleInitializer {
 		Parameter genomeSizeParam = new Parameter("pop.subpop.0.species.genome-size");
 		state.parameters.set(genomeSizeParam, "" + initialWSCPool.getServiceSequence().size());
 		setupTime = System.currentTimeMillis() - startTime;
+		
+		
+		//initialise graph generator and its evaluator 
+		eval = new WSCEvaluation();
+		graGenerator = new WSCGraph();
 
 	}
 
