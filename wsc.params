@@ -21,7 +21,7 @@ stat.evaluations                               = $eval.stat
 stat.eval-sample-rate                          = 30
 
 pop.subpop.0.species		 = ec.vector.VectorSpecies
-pop.subpop.0.species.ind	 = wsc.SequenceVectorIndividual
+pop.subpop.0.species.ind	 = wsc.ecj.nsga2.SequenceVectorIndividual
 pop.subpop.0.species.fitness = ec.multiobjective.nsga2.NSGA2MultiObjectiveFitness
 
 multi.fitness.num-objectives = 2
@@ -36,9 +36,9 @@ multi.fitness.maximize.1 = true
 # The global mutation probability must be set, so we set it to 0
 pop.subpop.0.species.mutation-prob	= 0.0
 
-eval.problem            = wsc.WSCProblem
-init                    = wsc.WSCInitializer
-stat                    = wsc.WSCMultiObjectiveStatistics
+eval.problem            = wsc.problem.WSCProblem
+init                    = wsc.problem.WSCInitializer
+stat                    = wsc.ecj.nsga2.WSCMultiObjectiveStatistics
 stat.silent.front       = false
 stat.do-time            = true
 
@@ -48,10 +48,10 @@ breed                   = ec.multiobjective.nsga2.NSGA2Breeder
 
 #pop.subpop.0.species.pipe                      = ec.breed.MultiBreedingPipeline
 #pop.subpop.0.species.pipe.num-sources          = 2
-#pop.subpop.0.species.pipe.source.0             = wsc.WSCCrossoverPipeline
+#pop.subpop.0.species.pipe.source.0             = wsc.ecj.nsga2.WSCCrossoverPipeline
 #pop.subpop.0.species.pipe.source.0.prob        = 0.95
 #pop.subpop.0.species.pipe.source.0.num-sources = 2
-#pop.subpop.0.species.pipe.source.1             = wsc.WSCLocalSearchPipeline
+#pop.subpop.0.species.pipe.source.1             = wsc.ecj.nsga2.WSCLocalSearchPipeline
 #pop.subpop.0.species.pipe.source.1.prob        = 0.05
 #pop.subpop.0.species.pipe.source.1.num-sources = 1
 #pop.subpop.0.species.pipe.source.0.source.0	   = ec.select.TournamentSelection
@@ -61,10 +61,10 @@ breed                   = ec.multiobjective.nsga2.NSGA2Breeder
 
 pop.subpop.0.species.pipe                      = ec.breed.MultiBreedingPipeline
 pop.subpop.0.species.pipe.num-sources          = 3
-pop.subpop.0.species.pipe.source.0             = wsc.WSCCrossoverPipeline
+pop.subpop.0.species.pipe.source.0             = wsc.ecj.nsga2.WSCCrossoverPipeline
 pop.subpop.0.species.pipe.source.0.prob        = 0.8
 pop.subpop.0.species.pipe.source.0.num-sources = 2
-pop.subpop.0.species.pipe.source.1             = wsc.WSCMutationPipeline
+pop.subpop.0.species.pipe.source.1             = wsc.ecj.nsga2.WSCMutationPipeline
 pop.subpop.0.species.pipe.source.1.prob        = 0.1
 pop.subpop.0.species.pipe.source.1.num-sources = 1
 pop.subpop.0.species.pipe.source.2             = ec.breed.ReproductionPipeline

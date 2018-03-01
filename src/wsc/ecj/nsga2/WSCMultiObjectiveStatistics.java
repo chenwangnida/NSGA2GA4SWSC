@@ -20,38 +20,38 @@ public class WSCMultiObjectiveStatistics extends MultiObjectiveStatistics {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void preInitializationStatistics(final EvolutionState state) {
-		super.preInitializationStatistics(state);
-		lastTime = System.currentTimeMillis();
-	}
+    public void preInitializationStatistics(final EvolutionState state){
+	    super.preInitializationStatistics(state);
+	    lastTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void postInitializationStatistics(final EvolutionState state) {
+	    super.postInitializationStatistics(state);
+	    initTime = System.currentTimeMillis()-lastTime;
+    }
 
 	@Override
-	public void postInitializationStatistics(final EvolutionState state) {
-		super.postInitializationStatistics(state);
-		initTime = System.currentTimeMillis() - lastTime;
-	}
+    public void preBreedingStatistics(final EvolutionState state) {
+    	super.preBreedingStatistics(state);
+        lastTime = System.currentTimeMillis();
+    }
 
 	@Override
-	public void preBreedingStatistics(final EvolutionState state) {
-		super.preBreedingStatistics(state);
-		lastTime = System.currentTimeMillis();
-	}
+    public void postBreedingStatistics(final EvolutionState state) {
+	    super.postBreedingStatistics(state);
+        breedingTime = System.currentTimeMillis()-lastTime;
+    }
 
 	@Override
-	public void postBreedingStatistics(final EvolutionState state) {
-		super.postBreedingStatistics(state);
-		breedingTime = System.currentTimeMillis() - lastTime;
-	}
-
-	@Override
-	public void preEvaluationStatistics(final EvolutionState state) {
+    public void preEvaluationStatistics(final EvolutionState state) {
 		super.preEvaluationStatistics(state);
-		lastTime = System.currentTimeMillis();
-	}
+        lastTime = System.currentTimeMillis();
+    }
 
-	@Override
+    @Override
 	public void postEvaluationStatistics(final EvolutionState state) {
-		evaluationTime = System.currentTimeMillis() - lastTime;
+    	evaluationTime = System.currentTimeMillis()-lastTime;
 
 		for (int x = 0; x < state.population.subpops.length; x++) {
 			for (int y = 0; y < state.population.subpops[x].individuals.length; y++) {
@@ -66,7 +66,8 @@ public class WSCMultiObjectiveStatistics extends MultiObjectiveStatistics {
 				if (state.generation == 0) {
 					builder.append(initTime + breedingTime);
 					builder.append(" ");
-				} else {
+				}
+				else {
 					builder.append(breedingTime);
 					builder.append(" ");
 				}
@@ -89,17 +90,19 @@ public class WSCMultiObjectiveStatistics extends MultiObjectiveStatistics {
 				MultiObjectiveFitness typicalFitness = (MultiObjectiveFitness) (state.population.subpops[s].individuals[0].fitness);
 
 				// build front
-				ArrayList front = typicalFitness.partitionIntoParetoFront(state.population.subpops[s].individuals, null,
+				ArrayList front = MultiObjectiveFitness.partitionIntoParetoFront(state.population.subpops[s].individuals, null,
 						null);
 
 				// sort by objective[0]
 				Object[] sortedFront = front.toArray();
 				QuickSort.qsort(sortedFront, new SortComparator() {
+					@Override
 					public boolean lt(Object a, Object b) {
 						return (((MultiObjectiveFitness) (((Individual) a).fitness)).getObjective(
 								0) < (((MultiObjectiveFitness) ((Individual) b).fitness)).getObjective(0));
 					}
 
+					@Override
 					public boolean gt(Object a, Object b) {
 						return (((MultiObjectiveFitness) (((Individual) a).fitness)).getObjective(
 								0) > ((MultiObjectiveFitness) (((Individual) b).fitness)).getObjective(0));
@@ -118,16 +121,14 @@ public class WSCMultiObjectiveStatistics extends MultiObjectiveStatistics {
 	}
 
 	/**
-	 * Pass in a string builder and an individual, and this method will create a
-	 * String representation. This is saved in the String builder, and it can be
-	 * retrieved by calling the toString() method on it.
+	 * Pass in a string builder and an individual, and this method will create a String representation. This is
+	 * saved in the String builder, and it can be retrieved by calling the toString() method on it.
 	 *
 	 * @param ind
 	 * @param builder
 	 * @param finalFront
 	 */
-	public void individualStringRepresentation(SequenceVectorIndividual ind, StringBuilder builder, boolean finalFront,
-			EvolutionState state) {
+	public void individualStringRepresentation( SequenceVectorIndividual ind, StringBuilder builder, boolean finalFront, EvolutionState state) {
 
 		NSGA2MultiObjectiveFitness f = (NSGA2MultiObjectiveFitness) ind.fitness;
 		builder.append(f.rank);
@@ -137,10 +138,10 @@ public class WSCMultiObjectiveStatistics extends MultiObjectiveStatistics {
 
 		double[] objectives = f.getObjectives();
 
-		// builder.append(objectives[GraphInitializer.AVAILABILITY]);
-		// builder.append(" ");
-		// builder.append(objectives[GraphInitializer.RELIABILITY]);
-		// builder.append(" ");
+//		builder.append(objectives[GraphInitializer.AVAILABILITY]);
+//		builder.append(" ");
+//		builder.append(objectives[GraphInitializer.RELIABILITY]);
+//		builder.append(" ");
 		builder.append(objectives[0]);
 		builder.append(" ");
 		builder.append(objectives[1]);

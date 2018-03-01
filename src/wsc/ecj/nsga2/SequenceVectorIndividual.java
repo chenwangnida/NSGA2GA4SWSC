@@ -1,20 +1,13 @@
 package wsc.ecj.nsga2;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
 import ec.EvolutionState;
 import ec.Fitness;
-import ec.multiobjective.MultiObjectiveFitness;
 import ec.util.Parameter;
 import ec.vector.VectorIndividual;
+
 import wsc.data.pool.Service;
 import wsc.problem.WSCInitializer;
 
@@ -45,7 +38,7 @@ public class SequenceVectorIndividual extends VectorIndividual {
 	public void reset(EvolutionState state, int thread) {
 		WSCInitializer init = (WSCInitializer) state.initializer;
 		List<Service> relevantList = WSCInitializer.initialWSCPool.getServiceSequence();
-		Collections.shuffle(relevantList, init.random);
+		Collections.shuffle(relevantList, WSCInitializer.random);
 
 		genome = new Service[relevantList.size()];
 		relevantList.toArray(genome);

@@ -2,9 +2,11 @@ package wsc.problem;
 
 import java.util.Arrays;
 
-import ec.*;
+import ec.EvolutionState;
+import ec.Individual;
+import ec.Problem;
 import ec.multiobjective.MultiObjectiveFitness;
-import ec.simple.*;
+import ec.simple.SimpleProblemForm;
 import wsc.InitialWSCPool;
 import wsc.ecj.nsga2.SequenceVectorIndividual;
 import wsc.graph.ServiceGraph;
@@ -12,6 +14,7 @@ import wsc.graph.ServiceGraph;
 public class WSCProblem extends Problem implements SimpleProblemForm {
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public void evaluate(final EvolutionState state, final Individual ind, final int subpopulation,
 			final int threadnum) {
 		if (ind.evaluated)

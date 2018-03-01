@@ -64,12 +64,12 @@ public class WSCCrossoverPipeline extends BreedingPipeline {
     		SequenceVectorIndividual t2 = ((SequenceVectorIndividual)inds2[x]);
 
     		// Select two random index numbers as the boundaries for the crossover section
-    		int indexA = init.random.nextInt(t1.genome.length);
-    		int indexB = init.random.nextInt(t1.genome.length);
+    		int indexA = WSCInitializer.random.nextInt(t1.genome.length);
+    		int indexB = WSCInitializer.random.nextInt(t1.genome.length);
 
     		// Make sure they are different
     		while (indexA == indexB)
-    			indexB = init.random.nextInt(t1.genome.length);
+    			indexB = WSCInitializer.random.nextInt(t1.genome.length);
 
     		// Determine which boundary they are
     		int minBoundary = Math.min(indexA, indexB);

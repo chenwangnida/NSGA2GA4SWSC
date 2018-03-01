@@ -43,8 +43,8 @@ public class WSCMutationPipeline extends BreedingPipeline {
         for(int q=start;q<n+start;q++) {
         	SequenceVectorIndividual tree = (SequenceVectorIndividual)inds[q];
 
-        	int indexA = init.random.nextInt(tree.genome.length);
-        	int indexB = init.random.nextInt(tree.genome.length);
+        	int indexA = WSCInitializer.random.nextInt(tree.genome.length);
+        	int indexB = WSCInitializer.random.nextInt(tree.genome.length);
         	swapServices(tree.genome, indexA, indexB);
             tree.evaluated=false;
         }
