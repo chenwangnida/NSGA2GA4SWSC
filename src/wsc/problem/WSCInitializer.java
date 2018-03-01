@@ -54,12 +54,12 @@ public class WSCInitializer extends SimpleInitializer {
 	public static final int RELIABILITY = 3;
 
 	// Fitness function weights
-	public double w1;
-	public double w2;
-	public double w3;
-	public double w4;
-	public double w5;
-	public double w6;
+	public static double w1;
+	public static double w2;
+	public static double w3;
+	public static double w4;
+	public static double w5;
+	public static double w6;
 	public static final double exact = 1.00;
 	public static final double plugin = 0.75;
 
@@ -81,7 +81,7 @@ public class WSCInitializer extends SimpleInitializer {
 	public static double MAXINUM_SEMANTICDISTANCE = 1;
 
 	// data
-	public WSCRandom random;
+	public static WSCRandom random;
 	public static List<String> taskInput;
 	public static List<String> taskOutput;
 	public static InitialWSCPool initialWSCPool;

@@ -30,6 +30,8 @@ public class SequenceVectorIndividual extends VectorIndividual {
 	private double semanticDistance;
 
 	public Service[] genome;
+	
+	private String strRepresentation; // a string of graph-based representation
 
 	@Override
 	public Parameter defaultBase() {
@@ -81,316 +83,74 @@ public class SequenceVectorIndividual extends VectorIndividual {
 
 	@Override
 	public SequenceVectorIndividual clone() {
-    	SequenceVectorIndividual g = new SequenceVectorIndividual();
-    	g.species = this.species;
-    	if (this.fitness == null)
-    		g.fitness = (Fitness) g.species.f_prototype.clone();
-    	else
-    		g.fitness = (Fitness) this.fitness.clone();
-    	if (genome != null) {
-    		// Shallow cloning is fine in this approach
-    		g.genome = genome.clone();
-    	}
-    	return g;
+		SequenceVectorIndividual g = new SequenceVectorIndividual();
+		g.species = this.species;
+		if (this.fitness == null)
+			g.fitness = (Fitness) g.species.f_prototype.clone();
+		else
+			g.fitness = (Fitness) this.fitness.clone();
+		if (genome != null) {
+			// Shallow cloning is fine in this approach
+			g.genome = genome.clone();
+		}
+		return g;
 	}
 
-	public String toGraphString(EvolutionState state) {
-		WSCInitializer init = (WSCInitializer) state.initializer;
-		Graph g = createNewGraph(init.numLayers, init.startServ, init.endServ, genome, init);
-		return g.toString();
+	public void setAvailability(double availability) {
+		this.availability = availability;
 	}
 
-	public Graph createNewGraph(int numLayers, Service start, Service end, Service[] sequence, WSCInitializer init) {
-		Node endNode = new Node(end);
-		Node startNode = new Node(start);
-
-        Graph graph = new Graph();
-        graph.nodeMap.put(endNode.getName(), endNode);
-
-        // Populate inputs to satisfy with end node's inputs
-        List<InputNodeLayerTrio> nextInputsToSatisfy = new ArrayList<InputNodeLayerTrio>();
-
-        for (String input : end.getInputs()){
-            nextInputsToSatisfy.add( new InputNodeLayerTrio(input, end.getName(), numLayers) );
-        }
-
-        // Fulfil inputs layer by layer
-        for (int currLayer = numLayers; currLayer > 0; currLayer--) {
-
-            // Filter out the inputs from this layer that need to fulfilled
-            List<InputNodeLayerTrio> inputsToSatisfy = new ArrayList<InputNodeLayerTrio>();
-            for (InputNodeLayerTrio p : nextInputsToSatisfy) {
-               if (p.layer == currLayer)
-                   inputsToSatisfy.add( p );
-            }
-            nextInputsToSatisfy.removeAll( inputsToSatisfy );
-
-            int index = 0;
-            while (!inputsToSatisfy.isEmpty()){
-
-                if (index >= sequence.length) {
-                    nextInputsToSatisfy.addAll( inputsToSatisfy );
-                    inputsToSatisfy.clear();
-                }
-                else {
-                	Service nextNode = sequence[index++];
-                	if (nextNode.layer < currLayer) {
-	                    Node n = new Node(nextNode);
-	                    //int nLayer = nextNode.layerNum;
-
-	                    List<InputNodeLayerTrio> satisfied = getInputsSatisfiedGraphBuilding(inputsToSatisfy, n, init);
-
-	                    if (!satisfied.isEmpty()) {
-	                        if (!graph.nodeMap.containsKey( n.getName() )) {
-	                            graph.nodeMap.put(n.getName(), n);
-	                        }
-
-	                        // Add edges
-	                        createEdges(n, satisfied, graph);
-	                        inputsToSatisfy.removeAll(satisfied);
-
-
-	                        for(String input : n.getInputs()) {
-	                            nextInputsToSatisfy.add( new InputNodeLayerTrio(input, n.getName(), n.getLayer()) );
-	                        }
-	                    }
-	                }
-                }
-            }
-        }
-
-        // Connect start node
-        graph.nodeMap.put(startNode.getName(), startNode);
-        createEdges(startNode, nextInputsToSatisfy, graph);
-
-        return graph;
-    }
-
-	public void createEdges(Node origin, List<InputNodeLayerTrio> destinations, Graph graph) {
-		// Order inputs by destination
-		Map<String, Set<String>> intersectMap = new HashMap<String, Set<String>>();
-		for(InputNodeLayerTrio t : destinations) {
-			addToIntersectMap(t.service, t.input, intersectMap);
-		}
-
-		for (Entry<String,Set<String>> entry : intersectMap.entrySet()) {
-			Edge e = new Edge(entry.getValue());
-			origin.getOutgoingEdgeList().add(e);
-			Node destination = graph.nodeMap.get(entry.getKey());
-			destination.getIncomingEdgeList().add(e);
-			e.setFromNode(origin);
-        	e.setToNode(destination);
-        	graph.edgeList.add(e);
-		}
+	public void setReliability(double reliability) {
+		this.reliability = reliability;
 	}
 
-	private void addToIntersectMap(String destination, String input, Map<String, Set<String>> intersectMap) {
-		Set<String> intersect = intersectMap.get(destination);
-		if (intersect == null) {
-			intersect = new HashSet<String>();
-			intersectMap.put(destination, intersect);
-		}
-		intersect.add(input);
+	public void setTime(double time) {
+		this.time = time;
 	}
 
-	public List<InputNodeLayerTrio> getInputsSatisfiedGraphBuilding(List<InputNodeLayerTrio> inputsToSatisfy, Node n, WSCInitializer init) {
-	    List<InputNodeLayerTrio> satisfied = new ArrayList<InputNodeLayerTrio>();
-	    for(InputNodeLayerTrio p : inputsToSatisfy) {
-            if (init.taxonomyMap.get(p.input).servicesWithOutput.contains( n.getService() ))
-                satisfied.add( p );
-        }
-	    return satisfied;
+	public void setCost(double cost) {
+		this.cost = cost;
 	}
 
-	   public void calculateSequenceFitness(int numLayers, Service end, Service[] sequence, WSCInitializer init, EvolutionState state, boolean isOperation) {
+	public double getAvailability() {
+		return availability;
+	}
 
-	        Set<Service> solution = new HashSet<Service>();
+	public double getReliability() {
+		return reliability;
+	}
 
-	        cost = 0.0;
-	        availability = 1.0;
-	        reliability = 1.0;
+	public double getTime() {
+		return time;
+	}
 
-	        // Populate inputs to satisfy with end node's inputs
-	        List<InputTimeLayerTrio> nextInputsToSatisfy = new ArrayList<InputTimeLayerTrio>();
-	        double t = end.getQos()[WSCInitializer.TIME];
-	        for (String input : end.getInputs()){
-	            nextInputsToSatisfy.add( new InputTimeLayerTrio(input, t, numLayers) );
-	        }
+	public double getCost() {
+		return cost;
+	}
 
-	        // Fulfil inputs layer by layer
-	        for (int currLayer = numLayers; currLayer > 0; currLayer--) {
-	            // Filter out the inputs from this layer that need to fulfilled
-	            List<InputTimeLayerTrio> inputsToSatisfy = new ArrayList<InputTimeLayerTrio>();
-	            for (InputTimeLayerTrio p : nextInputsToSatisfy) {
-	               if (p.layer == currLayer)
-	                   inputsToSatisfy.add( p );
-	            }
-	            nextInputsToSatisfy.removeAll( inputsToSatisfy );
+	public double getMatchingType() {
+		return matchingType;
+	}
 
-	            int index = 0;
-	            while (!inputsToSatisfy.isEmpty()){
-	                // If all nodes have been attempted, inputs must be fulfilled with start node
-	                if (index >= sequence.length) {
-	                    nextInputsToSatisfy.addAll(inputsToSatisfy);
-	                    inputsToSatisfy.clear();
-	                }
-	                else {
-	                Service nextNode = sequence[index++];
-	                if (nextNode.layer < currLayer) {
+	public void setMatchingType(double matchingType) {
+		this.matchingType = matchingType;
+	}
 
-	   	                List<InputTimeLayerTrio> satisfied = getInputsSatisfied(inputsToSatisfy, nextNode, init);
-	   	                if (!satisfied.isEmpty()) {
-	                           double[] qos = nextNode.getQos();
-	                           if (!solution.contains( nextNode )) {
-	                               solution.add(nextNode);
-	                               cost += qos[WSCInitializer.COST];
-	                               availability *= qos[WSCInitializer.AVAILABILITY];
-	                               reliability *= qos[WSCInitializer.RELIABILITY];
-	                           }
-	                           t = qos[WSCInitializer.TIME];
-	                           inputsToSatisfy.removeAll(satisfied);
+	public double getSemanticDistance() {
+		return semanticDistance;
+	}
 
-	                           double highestT = findHighestTime(satisfied);
+	public void setSemanticDistance(double semanticDistance) {
+		this.semanticDistance = semanticDistance;
+	}
 
-	                           for(String input : nextNode.getInputs()) {
-	                               nextInputsToSatisfy.add( new InputTimeLayerTrio(input, highestT + t, nextNode.layer) );
-	                           }
-	                       }
-		               }
-	                }
-	            }
-	        }
+	public String getStrRepresentation() {
+		return strRepresentation;
+	}
 
-	        // Find the highest overall time
-	        time = findHighestTime(nextInputsToSatisfy);
-
-	        if (!WSCInitializer.dynamicNormalisation || isOperation)
-	        	finishCalculatingSequenceFitness(init, state);
-	    }
-
-	   public void finishCalculatingSequenceFitness(WSCInitializer init, EvolutionState state) {
-		   double[] objectives = calculateFitness(cost, time, availability, reliability, init);
-			//init.trackFitnessPerEvaluations(f);
-
-			((MultiObjectiveFitness) fitness).setObjectives(state, objectives);
-			evaluated = true;
-	   }
-
-		public double findHighestTime(List<InputTimeLayerTrio> satisfied) {
-		    double max = Double.MIN_VALUE;
-
-		    for (InputTimeLayerTrio p : satisfied) {
-		        if (p.time > max)
-		            max = p.time;
-		    }
-
-		    return max;
-		}
-
-		public double[] calculateFitness(double c, double t, double a, double r, WSCInitializer init) {
-	        a = normaliseAvailability(a, init);
-	        r = normaliseReliability(r, init);
-	        t = normaliseTime(t, init);
-	        c = normaliseCost(c, init);
-
-	        double[] objectives = new double[2];
-	        //objectives[GraphInitializer.AVAILABILITY] = a;
-	        //objectives[GraphInitializer.RELIABILITY] = r;
-	        //objectives[WSCInitializer.TIME] = t;
-	        //objectives[WSCInitializer.COST] = c;
-	        objectives[0] = t + c;
-	        objectives[1] = a + r;
-
-	        return objectives;
-		}
-
-		private double normaliseAvailability(double availability, WSCInitializer init) {
-			if (init.maxAvailability - init.minAvailability == 0.0)
-				return 1.0;
-			else
-				//return (availability - init.minAvailability)/(init.maxAvailability - init.minAvailability);
-				return (init.maxAvailability - availability)/(init.maxAvailability - init.minAvailability);
-		}
-
-		private double normaliseReliability(double reliability, WSCInitializer init) {
-			if (init.maxReliability- init.minReliability == 0.0)
-				return 1.0;
-			else
-				//return (reliability - init.minReliability)/(init.maxReliability - init.minReliability);
-				return (init.maxReliability - reliability)/(init.maxReliability - init.minReliability);
-		}
-
-		private double normaliseTime(double time, WSCInitializer init) {
-			if (init.maxTime - init.minTime == 0.0)
-				return 1.0;
-			else
-				//return (init.maxTime - time)/(init.maxTime - init.minTime);
-				return (time - init.minTime)/(init.maxTime - init.minTime);
-		}
-
-		private double normaliseCost(double cost, WSCInitializer init) {
-			if (init.maxCost - init.minCost == 0.0)
-				return 1.0;
-			else
-				//return (init.maxCost - cost)/(init.maxCost - init.minCost);
-				return (cost - init.minCost)/(init.maxCost - init.minCost);
-		}
-
-		public List<InputTimeLayerTrio> getInputsSatisfied(List<InputTimeLayerTrio> inputsToSatisfy, Service n, WSCInitializer init) {
-		    List<InputTimeLayerTrio> satisfied = new ArrayList<InputTimeLayerTrio>();
-		    for(InputTimeLayerTrio p : inputsToSatisfy) {
-	            if (init.taxonomyMap.get(p.input).servicesWithOutput.contains( n ))
-	                satisfied.add( p );
-	        }
-		    return satisfied;
-		}
-
-		public void setAvailability(double availability) {
-			this.availability = availability;
-		}
-
-		public void setReliability(double reliability) {
-			this.reliability = reliability;
-		}
-
-		public void setTime(double time) {
-			this.time = time;
-		}
-
-		public void setCost(double cost) {
-			this.cost = cost;
-		}
-
-		public double getAvailability() {
-			return availability;
-		}
-
-		public double getReliability() {
-			return reliability;
-		}
-
-		public double getTime() {
-			return time;
-		}
-
-		public double getCost() {
-			return cost;
-		}
-
-		public double getMatchingType() {
-			return matchingType;
-		}
-
-		public void setMatchingType(double matchingType) {
-			this.matchingType = matchingType;
-		}
-
-		public double getSemanticDistance() {
-			return semanticDistance;
-		}
-
-		public void setSemanticDistance(double semanticDistance) {
-			this.semanticDistance = semanticDistance;
-		}
+	public void setStrRepresentation(String strRepresentation) {
+		this.strRepresentation = strRepresentation;
+	}
+	
 
 }

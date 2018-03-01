@@ -13,7 +13,8 @@ import wsc.graph.ServiceEdge;
 
 public class WSCEvaluation {
 
-	public void aggregationAttribute(SequenceVectorIndividual individual, DirectedGraph<String, ServiceEdge> directedGraph) {
+	public void aggregationAttribute(SequenceVectorIndividual individual,
+			DirectedGraph<String, ServiceEdge> directedGraph) {
 
 		double a = 1.0;
 		double r = 1.0;
@@ -55,7 +56,7 @@ public class WSCEvaluation {
 		individual.setCost(c);
 	}
 
-	public double calculateFitness(SequenceVectorIndividual individual) {
+	public double[] calculateFitness(SequenceVectorIndividual individual) {
 
 		double mt = individual.getMatchingType();
 		double dst = individual.getSemanticDistance();
@@ -71,10 +72,12 @@ public class WSCEvaluation {
 		t = normaliseTime(t);
 		c = normaliseCost(c);
 
-		individual.fitness = ((WSCInitializer.W1 * mt) + (WSCInitializer.W2 * dst) + (WSCInitializer.W3 * a)
-				+ (WSCInitializer.W4 * r) + (WSCInitializer.W5 * t) + (WSCInitializer.W6 * c));
+		double[] objectives = new double[2];
+		objectives[0] = (WSCInitializer.w1 * mt) + (WSCInitializer.w2 * dst);
+		objectives[1] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r) + (WSCInitializer.w5 * t)
+				+ (WSCInitializer.w6 * c);
 
-		return individual.fitness;
+		return objectives;
 	}
 
 	private double normaliseMatchType(double matchType) {
