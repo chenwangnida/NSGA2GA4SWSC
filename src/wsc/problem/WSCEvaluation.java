@@ -73,13 +73,12 @@ public class WSCEvaluation {
 		c = normaliseCost(c);
 
 		double[] objectives = new double[2];
-		objectives[0] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r);
-		objectives[1] = (WSCInitializer.w5 * t) + (WSCInitializer.w6 * c);
+//		objectives[0] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r);
+//		objectives[1] = (WSCInitializer.w5 * t) + (WSCInitializer.w6 * c);
 
-		// objectives[0] = (WSCInitializer.w1 * mt) + (WSCInitializer.w2 * dst);
-		// objectives[1] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r) +
-		// (WSCInitializer.w5 * t)
-		// + (WSCInitializer.w6 * c);
+		objectives[0] = (WSCInitializer.w1 * mt) + (WSCInitializer.w2 * dst);
+		objectives[1] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r) + (WSCInitializer.w5 * t)
+				+ (WSCInitializer.w6 * c);
 
 		return objectives;
 	}
