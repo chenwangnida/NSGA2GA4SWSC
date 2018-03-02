@@ -73,9 +73,13 @@ public class WSCEvaluation {
 		c = normaliseCost(c);
 
 		double[] objectives = new double[2];
-		objectives[0] = (WSCInitializer.w1 * mt) + (WSCInitializer.w2 * dst);
-		objectives[1] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r) + (WSCInitializer.w5 * t)
-				+ (WSCInitializer.w6 * c);
+		objectives[0] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r);
+		objectives[1] = (WSCInitializer.w5 * t) + (WSCInitializer.w6 * c);
+
+		// objectives[0] = (WSCInitializer.w1 * mt) + (WSCInitializer.w2 * dst);
+		// objectives[1] = (WSCInitializer.w3 * a) + (WSCInitializer.w4 * r) +
+		// (WSCInitializer.w5 * t)
+		// + (WSCInitializer.w6 * c);
 
 		return objectives;
 	}
@@ -84,7 +88,7 @@ public class WSCEvaluation {
 		if (WSCInitializer.MAXINUM_MATCHTYPE - WSCInitializer.MINIMUM_MATCHTYPE == 0.0)
 			return 1.0;
 		else
-			return (matchType - WSCInitializer.MINIMUM_MATCHTYPE)
+			return (WSCInitializer.MAXINUM_MATCHTYPE - matchType)
 					/ (WSCInitializer.MAXINUM_MATCHTYPE - WSCInitializer.MINIMUM_MATCHTYPE);
 	}
 
@@ -92,7 +96,7 @@ public class WSCEvaluation {
 		if (WSCInitializer.MAXINUM_SEMANTICDISTANCE - WSCInitializer.MININUM_SEMANTICDISTANCE == 0.0)
 			return 1.0;
 		else
-			return (distanceValue - WSCInitializer.MININUM_SEMANTICDISTANCE)
+			return (WSCInitializer.MAXINUM_SEMANTICDISTANCE - distanceValue)
 					/ (WSCInitializer.MAXINUM_SEMANTICDISTANCE - WSCInitializer.MININUM_SEMANTICDISTANCE);
 	}
 
@@ -100,7 +104,7 @@ public class WSCEvaluation {
 		if (WSCInitializer.MAXIMUM_AVAILABILITY - WSCInitializer.MINIMUM_AVAILABILITY == 0.0)
 			return 1.0;
 		else
-			return (availability - WSCInitializer.MINIMUM_AVAILABILITY)
+			return (WSCInitializer.MAXIMUM_AVAILABILITY - availability)
 					/ (WSCInitializer.MAXIMUM_AVAILABILITY - WSCInitializer.MINIMUM_AVAILABILITY);
 	}
 
@@ -108,7 +112,7 @@ public class WSCEvaluation {
 		if (WSCInitializer.MAXIMUM_RELIABILITY - WSCInitializer.MINIMUM_RELIABILITY == 0.0)
 			return 1.0;
 		else
-			return (reliability - WSCInitializer.MINIMUM_RELIABILITY)
+			return (WSCInitializer.MAXIMUM_RELIABILITY - reliability)
 					/ (WSCInitializer.MAXIMUM_RELIABILITY - WSCInitializer.MINIMUM_RELIABILITY);
 	}
 
@@ -116,14 +120,14 @@ public class WSCEvaluation {
 		if (WSCInitializer.MAXIMUM_TIME - WSCInitializer.MINIMUM_TIME == 0.0)
 			return 1.0;
 		else
-			return (WSCInitializer.MAXIMUM_TIME - time) / (WSCInitializer.MAXIMUM_TIME - WSCInitializer.MINIMUM_TIME);
+			return (time - WSCInitializer.MINIMUM_TIME) / (WSCInitializer.MAXIMUM_TIME - WSCInitializer.MINIMUM_TIME);
 	}
 
 	public double normaliseCost(double cost) {
 		if (WSCInitializer.MAXIMUM_COST - WSCInitializer.MINIMUM_COST == 0.0)
 			return 1.0;
 		else
-			return (WSCInitializer.MAXIMUM_COST - cost) / (WSCInitializer.MAXIMUM_COST - WSCInitializer.MINIMUM_COST);
+			return (cost - WSCInitializer.MINIMUM_COST) / (WSCInitializer.MAXIMUM_COST - WSCInitializer.MINIMUM_COST);
 	}
 
 	public static double getLongestPathVertexList(DirectedGraph<String, ServiceEdge> g,

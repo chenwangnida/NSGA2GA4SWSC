@@ -147,6 +147,10 @@ public class WSCMultiObjectiveStatistics extends MultiObjectiveStatistics {
 		builder.append(objectives[1]);
 		builder.append(" ");
 
+		builder.append(ind.getMatchingType());
+		builder.append(" ");
+		builder.append(ind.getSemanticDistance());
+		builder.append(" ");
 		builder.append(ind.getAvailability());
 		builder.append(" ");
 		builder.append(ind.getReliability());
