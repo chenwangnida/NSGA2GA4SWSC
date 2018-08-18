@@ -89,7 +89,7 @@ public class WSCMultiObjectiveStatistics extends MultiObjectiveStatistics {
 			for (int s = 0; s < state.population.subpops.length; s++) {
 				MultiObjectiveFitness typicalFitness = (MultiObjectiveFitness) (state.population.subpops[s].individuals[0].fitness);
 
-				// build front
+				// the Pareto front is returned
 				ArrayList front = MultiObjectiveFitness.partitionIntoParetoFront(state.population.subpops[s].individuals, null,
 						null);
 
