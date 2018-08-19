@@ -1,6 +1,5 @@
 package wsc;
 
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ import wsc.data.pool.Service;
 import wsc.problem.WSCInitializer;
 import wsc.graph.ParamterConn;
 import wsc.graph.ServiceEdge;
+import wsc.graph.ServiceInput;
 import wsc.graph.ServiceOutput;
 
 public class InitialWSCPool {
@@ -31,6 +31,8 @@ public class InitialWSCPool {
 	private final HashSet<String> outputSet = new HashSet<String>();
 	private final SemanticsPool semanticsPool;
 	private final List<Service> serviceSequence = new LinkedList<Service>();
+
+	private static Map<Integer, List<Service>> layers = new HashMap<Integer, List<Service>>();
 
 	// a vector based representation
 	// public static Set<Service> usedSerQueue = new HashSet<Service>();
@@ -66,6 +68,14 @@ public class InitialWSCPool {
 
 	public static void setServiceCandidates(List<Service> serviceCandidates) {
 		InitialWSCPool.serviceCandidates = serviceCandidates;
+	}
+
+	public static Map<Integer, List<Service>> getLayers() {
+		return layers;
+	}
+
+	public static void setLayers(Map<Integer, List<Service>> layers) {
+		InitialWSCPool.layers = layers;
 	}
 
 	/**
@@ -314,6 +324,36 @@ public class InitialWSCPool {
 		} while (true);
 	}
 
+	/**
+	 * given a task associated to find a set of services associated with different
+	 * layers
+	 *
+	 * @param giveninput
+	 *
+	 * @param givenoutput
+	 *
+	 */
+	public void allRelevantService4Layers(List input, List output) throws JAXBException, IOException {
+		int numLayer = 0;
+
+		this.outputSet.addAll(input);
+		do {
+
+			List<Service> services4Layer = this.swsPool.findPossibleService4Layers(this.outputSet);
+			if (services4Layer.size() == 0) {
+				return;
+			}
+
+			numLayer++;
+			layers.put(numLayer, services4Layer);
+			for (Service s : services4Layer) {
+				s.setLayer(numLayer);
+			}
+			services4Layer.forEach(service -> this.getServiceSequence().add(service));
+
+		} while (true);
+	}
+
 	public void createGraphService(List<String> taskInput, List<String> taskOutput,
 			DirectedGraph<String, ServiceEdge> directedGraph) {
 		graphOutputs.clear();
@@ -478,6 +518,75 @@ public class InitialWSCPool {
 
 		} while (!goalSatisfied);
 
+	}
+
+	/**
+	 * check whether output is required by the defined required Output
+	 *
+	 * @param requiredOutput
+	 *            can be considered as predecessor' outputs
+	 * @param requiredInputs
+	 *            can be considered as current service inputs
+	 * @return
+	 */
+	public int createEdge4TwoSer(DirectedGraph<String, ServiceEdge> directedGraph, Service predecessor, Service s) {
+		pConnList.clear();
+		double summt;
+		double sumdst;
+
+		for (int i = 0; i < predecessor.getOutputList().size(); i++) {
+			ServiceOutput predecessorOutput = predecessor.getOutputList().get(i);
+			// get output of predecessor
+			String outputInst = predecessorOutput.getOutput();
+			for (int j = 0; j < s.getInputList().size(); j++) {
+				// To do : only consider inputs status is false
+				ServiceInput serInputReq = s.getInputList().get(j);
+				if (!serInputReq.isSatified()) {
+					// get unsatisfied input of predecessor
+					String intputreq = serInputReq.getInput();
+					ParamterConn pConn = this.semanticsPool.searchSemanticMatchTypeFromInst(outputInst, intputreq);
+					boolean foundmatched = pConn.isConsidered();
+					if (foundmatched) {
+						serInputReq.setSatified(true);
+						pConn.setSourceServiceID(predecessor.getServiceID());
+						pConn.setTargetServiceID(s.getServiceID());
+						pConnList.add(pConn);
+						// break ;
+					}
+				}
+			}
+		}
+
+		int NoofMatchedUnsatisfiedIn = 0;
+		if (pConnList != null) {
+			NoofMatchedUnsatisfiedIn = pConnList.size();
+		}
+
+		if (NoofMatchedUnsatisfiedIn > 0) {
+			directedGraph.addVertex(predecessor.getServiceID());
+			directedGraph.addVertex(s.getServiceID());
+
+			ServiceEdge serEdge = new ServiceEdge(0, 0);
+			serEdge.setSourceService(predecessor.getServiceID());
+			serEdge.setTargetService(s.getServiceID());
+			serEdge.getpConnList().addAll(pConnList);
+
+			summt = 0.00;
+			sumdst = 0.00;
+			for (int i1 = 0; i1 < serEdge.getpConnList().size(); i1++) {
+				ParamterConn pCo = serEdge.getpConnList().get(i1);
+				summt += pCo.getMatchType();
+				sumdst += pCo.getSimilarity();
+			}
+			int count = serEdge.getpConnList().size();
+			serEdge.setAvgmt(summt / count);
+			serEdge.setAvgsdt(sumdst / count);
+			directedGraph.addEdge(serEdge.getSourceService(), s.getServiceID(), serEdge);
+			// }
+			return NoofMatchedUnsatisfiedIn;
+		}
+
+		return NoofMatchedUnsatisfiedIn;
 	}
 
 	// public void createGraphService4Mutation(List<String> combinedInputs,
